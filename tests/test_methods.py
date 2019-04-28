@@ -1,8 +1,8 @@
+import itertools
 from functools import reduce
 from operator import add
 
 from chiter import ChIter
-import itertools
 
 
 def test_filter():
