@@ -1,4 +1,4 @@
-# ChIter - iterator as a chain
+# ChIter - iterable as a chain
 
 Example:
 ```python
