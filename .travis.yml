@@ -7,7 +7,6 @@ install:
   - pip install pipenv
   - pipenv install --dev --system --deploy
 
-
 script:
   - set PYTHONPATH=.
   - flake8
