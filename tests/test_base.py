@@ -96,3 +96,16 @@ def test_length_hint():
 
     assert isinstance(i, int)
     assert i == length_hint(range(5))
+
+
+def test_from_iterables():
+    i = ChIter.from_iterables(range(5), range(5, 10))
+
+    assert isinstance(i, ChIter)
+    assert list(i) == list(range(10))
+
+
+def test_from_iterables_with_length_hint():
+    i = ChIter.from_iterables(range(5), range(5, 10))
+
+    assert length_hint(i) == length_hint(range(10))

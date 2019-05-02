@@ -12,7 +12,7 @@ class ChIter(Iterator[Any], metaclass=ChIterMeta):
     __slots__ = ('_iterable', '_length_hint')
 
     @classmethod
-    def from_chain(cls, *iterables) -> ChIter:
+    def from_iterables(cls, *iterables) -> ChIter:
         obj = cls(itertools.chain(*iterables))
         obj._length_hint = sum(map(length_hint, iterables))
         return obj
@@ -32,12 +32,12 @@ class ChIter(Iterator[Any], metaclass=ChIterMeta):
     def __add__(self, other) -> ChIter:
         if not hasattr(other, '__iter__'):
             return NotImplemented
-        return type(self).from_chain(self, other)
+        return type(self).from_iterables(self, other)
 
     def __radd__(self, other) -> ChIter:
         if not hasattr(other, '__iter__'):
             return NotImplemented
-        return type(self).from_chain(other, self)
+        return type(self).from_iterables(other, self)
 
     def __length_hint__(self) -> int:
         return self._length_hint
@@ -67,8 +67,29 @@ class ChIter(Iterator[Any], metaclass=ChIterMeta):
     def accumulate(self, func=add) -> ChIter:
         return itertools.accumulate(self, func)
 
+    def combinations(self, r: int) -> ChIter:
+        return itertools.combinations(self, r)
+
+    def combinations_with_replacement(self, r: int) -> ChIter:
+        return itertools.combinations_with_replacement(self, r)
+
+    def compress(self, selectors: Iterable[bool]) -> ChIter:
+        return itertools.compress(self, selectors)
+
+    def dropwhile(self, predicate: Callable) -> ChIter:
+        return itertools.dropwhile(predicate, self)
+
+    def groupby(self, key: Optional[Callable] = None) -> ChIter:
+        return itertools.groupby(self, key=key)
+
+    def filterfalse(self, predicate: Callable) -> ChIter:
+        return itertools.filterfalse(predicate, self)
+
     def tee(self, n: int = 2) -> ChIter:
         return map(type(self), itertools.tee(self, n))
+
+    def cycle(self) -> ChIter:
+        return itertools.cycle(self)
 
     def flatten(self) -> ChIter:
         return itertools.chain.from_iterable(self)

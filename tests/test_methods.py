@@ -119,3 +119,73 @@ def test_tee_n():
     assert isinstance(i3, ChIter)
 
     assert list(i1) == list(i2) == list(i3)
+
+
+def test_cycle():
+    i = ChIter([None]).cycle()
+
+    assert isinstance(i, ChIter)
+    assert list(zip(i, range(5))) == list(zip(itertools.cycle([None]), range(5)))
+
+
+def test_combinations():
+    i = ChIter(range(5)).combinations(2)
+
+    assert isinstance(i, ChIter)
+    assert list(itertools.combinations(range(5), 2)) == list(i)
+
+
+def test_combinations_with_replacement():
+    i = ChIter(range(5)).combinations_with_replacement(2)
+
+    assert isinstance(i, ChIter)
+    assert list(itertools.combinations_with_replacement(range(5), 2)) == list(i)
+
+
+def test_compress():
+    selectors = [True, False, True]
+    i = ChIter(range(5)).compress(selectors)
+
+    assert isinstance(i, ChIter)
+    assert list(itertools.compress(range(5), selectors)) == list(i)
+
+
+def test_dropwhile():
+    def func(x):
+        return x > 2
+
+    i = ChIter(range(5)).dropwhile(func)
+
+    assert isinstance(i, ChIter)
+    assert list(itertools.dropwhile(func, range(5))) == list(i)
+
+
+def test_filterfalse():
+    def func(x):
+        return x % 2
+
+    i = ChIter(range(5)).filterfalse(func)
+
+    assert isinstance(i, ChIter)
+    assert list(itertools.filterfalse(func, range(5))) == list(i)
+
+
+def test_groupby():
+    iterable = [1, 1, 3, 2, 2]
+
+    i = ChIter(iterable).groupby()
+
+    assert isinstance(i, ChIter)
+    assert [(k, list(g)) for k, g in itertools.groupby(iterable)] == [(k, list(g)) for k, g in i]
+
+
+def test_groupby_key():
+    def key(x):
+        return x % 2
+
+    iterable = [1, 1, 3, 2, 2]
+
+    i = ChIter(iterable).groupby(key)
+
+    assert isinstance(i, ChIter)
+    assert [(k, list(g)) for k, g in itertools.groupby(iterable, key)] == [(k, list(g)) for k, g in i]
