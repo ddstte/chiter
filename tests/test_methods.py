@@ -94,3 +94,28 @@ def test_flatten():
 
     assert isinstance(i, ChIter)
     assert list(i) == list(itertools.chain.from_iterable(enumerate(range(5))))
+
+
+def test_tee():
+    i = ChIter(range(5)).tee()
+
+    assert isinstance(i, ChIter)
+    i1, i2 = i
+
+    assert isinstance(i1, ChIter)
+    assert isinstance(i2, ChIter)
+
+    assert list(i1) == list(i2)
+
+
+def test_tee_n():
+    i = ChIter(range(5)).tee(3)
+
+    assert isinstance(i, ChIter)
+    i1, i2, i3 = i
+
+    assert isinstance(i1, ChIter)
+    assert isinstance(i2, ChIter)
+    assert isinstance(i3, ChIter)
+
+    assert list(i1) == list(i2) == list(i3)

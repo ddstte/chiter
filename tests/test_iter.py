@@ -20,6 +20,14 @@ def test_next():
     assert item is None
 
 
+def test_next_with_length_hint():
+    i = ChIter([None])
+
+    assert length_hint(i) == 1
+    next(i)
+    assert length_hint(i) == 0
+
+
 def test_next_empty():
     with pytest.raises(StopIteration):
         next(ChIter([]))
@@ -32,11 +40,29 @@ def test_add():
     assert list(i) == list(range(10))
 
 
+def test_add_with_length_hint():
+    one = ChIter(range(5))
+    two = ChIter(range(5, 10))
+    i = one + two
+    length = length_hint(one) + length_hint(two)
+
+    assert length_hint(i) == length
+
+
 def test_add_left():
     i = ChIter(range(5)) + range(5, 10)
 
     assert isinstance(i, ChIter)
     assert list(i) == list(range(10))
+
+
+def test_add_left_with_length_hint():
+    one = ChIter(range(5))
+    two = range(5, 10)
+    i = one + two
+    length = length_hint(one) + length_hint(two)
+
+    assert length_hint(i) == length
 
 
 def test_add_left_not_iter():
@@ -51,33 +77,18 @@ def test_add_right():
     assert list(i) == list(range(10))
 
 
+def test_add_right_with_length_hint():
+    one = range(5, 10)
+    two = ChIter(range(5))
+    i = one + two
+    length = length_hint(one) + length_hint(two)
+
+    assert length_hint(i) == length
+
+
 def test_add_right_not_iter():
     with pytest.raises(TypeError):
         None + ChIter(range(5, 10))
-
-
-def test_or_left():
-    i = ChIter(range(5)) | range(5, 10)
-
-    assert isinstance(i, ChIter)
-    assert list(i) == list(range(10))
-
-
-def test_or_left_not_iter():
-    with pytest.raises(TypeError):
-        ChIter(range(5)) | None
-
-
-def test_or_right():
-    i = range(5) | ChIter(range(5, 10))
-
-    assert isinstance(i, ChIter)
-    assert list(i) == list(range(10))
-
-
-def test_or_right_not_iter():
-    with pytest.raises(TypeError):
-        None | ChIter(range(5, 10))
 
 
 def test_length_hint():

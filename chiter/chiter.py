@@ -11,6 +11,12 @@ from .meta import ChIterMeta
 class ChIter(Iterator[Any], metaclass=ChIterMeta):
     __slots__ = ('_iterable', '_length_hint')
 
+    @classmethod
+    def from_chain(cls, *iterables) -> ChIter:
+        obj = cls(itertools.chain(*iterables))
+        obj._length_hint = sum(map(length_hint, iterables))
+        return obj
+
     def __init__(self, iterable: Iterable):
         self._length_hint = length_hint(iterable)
         self._iterable = iter(iterable)
@@ -19,20 +25,19 @@ class ChIter(Iterator[Any], metaclass=ChIterMeta):
         return self
 
     def __next__(self) -> Any:
+        if self._length_hint:
+            self._length_hint -= 1
         return next(self._iterable)
 
     def __add__(self, other) -> ChIter:
         if not hasattr(other, '__iter__'):
             return NotImplemented
-        return itertools.chain(self, type(self)(other))
+        return type(self).from_chain(self, other)
 
     def __radd__(self, other) -> ChIter:
         if not hasattr(other, '__iter__'):
             return NotImplemented
-        return itertools.chain(type(self)(other), self)
-
-    __or__ = __add__
-    __ror__ = __radd__
+        return type(self).from_chain(other, self)
 
     def __length_hint__(self) -> int:
         return self._length_hint
@@ -61,6 +66,9 @@ class ChIter(Iterator[Any], metaclass=ChIterMeta):
 
     def accumulate(self, func=add) -> ChIter:
         return itertools.accumulate(self, func)
+
+    def tee(self, n: int = 2) -> ChIter:
+        return map(type(self), itertools.tee(self, n))
 
     def flatten(self) -> ChIter:
         return itertools.chain.from_iterable(self)
