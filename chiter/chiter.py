@@ -85,11 +85,32 @@ class ChIter(Iterator[Any], metaclass=ChIterMeta):
     def filterfalse(self, predicate: Callable) -> ChIter:
         return itertools.filterfalse(predicate, self)
 
+    def slice(self, start: int, stop: Optional[int] = None, step: Optional[int] = None) -> ChIter:
+        args = (start, stop, step)
+        start_is_stop = all((i is None for i in args[1:]))
+        slice_args = args[:1] if start_is_stop else args
+        return itertools.islice(self, *slice_args)
+
+    def permutations(self, r: Optional[int] = None) -> ChIter:
+        return itertools.permutations(self, r)
+
+    def product(self, *, repeat=1) -> ChIter:
+        return itertools.product(self, repeat=repeat)
+
+    def takewhile(self, func=Callable) -> ChIter:
+        return itertools.takewhile(func, self)
+
+    def starmap(self, func: Callable) -> ChIter:
+        return itertools.starmap(func, self)
+
     def tee(self, n: int = 2) -> ChIter:
         return map(type(self), itertools.tee(self, n))
 
     def cycle(self) -> ChIter:
         return itertools.cycle(self)
+
+    def zip_longest(self, *, fillvalue=None) -> ChIter:
+        return itertools.zip_longest(*self, fillvalue=fillvalue)
 
     def flatten(self) -> ChIter:
         return itertools.chain.from_iterable(self)

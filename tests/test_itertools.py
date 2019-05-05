@@ -1,85 +1,6 @@
 import itertools
-from functools import reduce
-from operator import add
 
 from chiter import ChIter
-
-
-def test_filter():
-    i = ChIter(range(5)).filter(lambda x: x > 2)
-
-    assert isinstance(i, ChIter)
-    assert list(i) == list(range(3, 5))
-
-
-def test_map():
-    i = ChIter(range(5)).map(lambda x: x + 1)
-
-    assert isinstance(i, ChIter)
-    assert list(i) == list(range(1, 6))
-
-
-def test_enumerate():
-    i = ChIter(range(5)).enumerate()
-
-    assert isinstance(i, ChIter)
-    assert list(i) == list(enumerate(range(5)))
-
-
-def test_enumerate_start():
-    i = ChIter(range(5)).enumerate(start=2)
-
-    assert isinstance(i, ChIter)
-    assert list(i) == list(enumerate(range(5), start=2))
-
-
-def test_zip():
-    i = ChIter(enumerate(range(5))).zip()
-
-    assert isinstance(i, ChIter)
-    assert list(i) == list(zip(*enumerate(range(5))))
-
-
-def test_reduce():
-    i = ChIter(range(5)).reduce(add)
-
-    assert isinstance(i, int)
-    assert i == reduce(add, range(5))
-
-
-def test_reduce_initial():
-    i = ChIter(range(5)).reduce(add, initial=2)
-
-    assert isinstance(i, int)
-    assert i == reduce(add, range(5), 2)
-
-
-def test_sorted():
-    i = ChIter(range(5)).sorted()
-
-    assert isinstance(i, ChIter)
-    assert list(i) == sorted(range(5))
-
-
-def test_sorted_key():
-    i = ChIter(range(5)).sorted(key=lambda x: -x)
-
-    assert isinstance(i, ChIter)
-    assert list(i) == sorted(range(5), key=lambda x: -x)
-
-
-def test_sorted_key_reverse():
-    i = ChIter(range(5)).sorted(key=lambda x: -x, reverse=True)
-
-    assert isinstance(i, ChIter)
-    assert list(i) == sorted(range(5), key=lambda x: -x, reverse=True)
-
-
-def test_reversed():
-    i = ChIter(range(5)).reversed()
-
-    assert isinstance(i, ChIter)
-    assert list(i) == list(reversed(range(5)))
 
 
 def test_accumulate():
@@ -189,3 +110,79 @@ def test_groupby_key():
 
     assert isinstance(i, ChIter)
     assert [(k, list(g)) for k, g in itertools.groupby(iterable, key)] == [(k, list(g)) for k, g in i]
+
+
+def test_slice():
+    i = ChIter(range(5)).slice(2)
+
+    assert isinstance(i, ChIter)
+    assert list(itertools.islice(range(5), 2)) == list(i)
+
+
+def test_slice_kwargs():
+    i = ChIter(range(5)).slice(start=1, stop=4, step=2)
+
+    assert isinstance(i, ChIter)
+    assert list(itertools.islice(range(5), 1, 4, 2)) == list(i)
+
+
+def test_permutations():
+    i = ChIter(range(5)).permutations()
+
+    assert isinstance(i, ChIter)
+    assert list(itertools.permutations(range(5))) == list(i)
+
+
+def test_permutations_repeat():
+    i = ChIter(range(5)).permutations(2)
+
+    assert isinstance(i, ChIter)
+    assert list(itertools.permutations(range(5), 2)) == list(i)
+
+
+def test_product():
+    i = ChIter(range(5)).product()
+
+    assert isinstance(i, ChIter)
+    assert list(itertools.product(range(5))) == list(i)
+
+
+def test_product_repeat():
+    i = ChIter(range(5)).product(repeat=2)
+
+    assert isinstance(i, ChIter)
+    assert list(itertools.product(range(5), repeat=2)) == list(i)
+
+
+def test_starmap():
+    i = ChIter(enumerate(range(5))).starmap(pow)
+
+    assert isinstance(i, ChIter)
+    assert list(itertools.starmap(pow, enumerate(range(5)))) == list(i)
+
+
+def test_takewhile():
+    def predicate(x):
+        return x <= 2
+
+    i = ChIter(range(5)).takewhile(predicate)
+
+    assert isinstance(i, ChIter)
+    assert list(itertools.takewhile(predicate, range(5))) == list(i)
+
+
+def test_zip_longest():
+    i = ChIter(enumerate(range(5))).zip_longest()
+
+    assert isinstance(i, ChIter)
+    assert list(itertools.zip_longest(*enumerate(range(5)))) == list(i)
+
+
+def test_zip_longest_fillvalue():
+    data = [(1, 2), (1,)]
+    empty_value = object()
+
+    i = ChIter(data).zip_longest(fillvalue=empty_value)
+
+    assert isinstance(i, ChIter)
+    assert list(itertools.zip_longest(*data, fillvalue=empty_value)) == list(i)
