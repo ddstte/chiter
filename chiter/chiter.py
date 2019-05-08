@@ -9,7 +9,7 @@ from .meta import ChIterMeta
 
 
 class ChIter(Iterator[Any], metaclass=ChIterMeta):
-    __slots__ = ('_iterable', '_length_hint')
+    __slots__ = ("_iterable", "_length_hint")
 
     @classmethod
     def from_iterables(cls, *iterables) -> ChIter:
@@ -30,12 +30,12 @@ class ChIter(Iterator[Any], metaclass=ChIterMeta):
         return next(self._iterable)
 
     def __add__(self, other) -> ChIter:
-        if not hasattr(other, '__iter__'):
+        if not hasattr(other, "__iter__"):
             return NotImplemented
         return type(self).from_iterables(self, other)
 
     def __radd__(self, other) -> ChIter:
-        if not hasattr(other, '__iter__'):
+        if not hasattr(other, "__iter__"):
             return NotImplemented
         return type(self).from_iterables(other, self)
 

@@ -3,11 +3,20 @@ python: 3.7
 dist: xenial
 sudo: true
 
-install:
-  - pip install pipenv
-  - pipenv install --dev --system --deploy
+stages:
+  - tests
 
-script:
-  - set PYTHONPATH=.
-  - flake8
-  - python -m pytest
+install:
+  - pip install poetry
+  - pipenv install
+
+jobs:
+  include:
+    - stage: test
+      name: lint
+      script:
+        - poetry run flake8
+        - poetry run black --check .
+    - stage: test
+      name: tests
+      script: poetry run pytest
