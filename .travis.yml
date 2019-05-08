@@ -8,7 +8,7 @@ stages:
 
 install:
   - pip install poetry
-  - pipenv install
+  - poetry install
 
 jobs:
   include:
