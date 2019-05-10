@@ -3,7 +3,7 @@ from __future__ import annotations
 import itertools
 from functools import reduce
 from operator import length_hint, add
-from typing import Any, Callable, Optional, Iterable, Iterator
+from typing import Any, Callable, Optional, Iterable, Iterator, Set, FrozenSet, List, Tuple, Dict
 
 from .meta import ChIterMeta
 
@@ -63,6 +63,27 @@ class ChIter(Iterator[Any], metaclass=ChIterMeta):
 
     def reversed(self) -> ChIter:
         return reversed(tuple(self))
+
+    def all(self) -> bool:
+        return all(self)
+
+    def any(self) -> bool:
+        return any(self)
+
+    def set(self) -> Set[Any]:
+        return set(self)
+
+    def frozenset(self) -> FrozenSet[Any]:
+        return frozenset(self)
+
+    def list(self) -> List[Any]:
+        return list(self)
+
+    def tuple(self) -> Tuple[Any]:
+        return tuple(self)
+
+    def dict(self) -> Dict[Any, Any]:
+        return dict(self)
 
     def accumulate(self, func=add) -> ChIter:
         return itertools.accumulate(self, func)

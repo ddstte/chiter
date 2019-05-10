@@ -79,3 +79,68 @@ def test_reversed():
 
     assert isinstance(i, ChIter)
     assert list(i) == list(reversed(range(5)))
+
+
+def test_all_true():
+    result = ChIter(range(1, 2)).all()
+
+    assert isinstance(result, bool)
+    assert result is True
+
+
+def test_all_false():
+    result = ChIter(range(2)).all()
+
+    assert isinstance(result, bool)
+    assert result is False
+
+
+def test_any_true():
+    result = ChIter(range(2)).any()
+
+    assert isinstance(result, bool)
+    assert result is True
+
+
+def test_any_false():
+    result = ChIter(range(1)).any()
+
+    assert isinstance(result, bool)
+    assert result is False
+
+
+def test_set():
+    i = ChIter(range(5)).set()
+
+    assert isinstance(i, set)
+    assert set(range(5)) == i
+
+
+def test_frozenset():
+    i = ChIter(range(5)).frozenset()
+
+    assert isinstance(i, frozenset)
+    assert frozenset(range(5)) == i
+
+
+def test_list():
+    i = ChIter(range(5)).list()
+
+    assert isinstance(i, list)
+    assert list(range(5)) == i
+
+
+def test_tuple():
+    i = ChIter(range(5)).tuple()
+
+    assert isinstance(i, tuple)
+    assert tuple(range(5)) == i
+
+
+def test_dict():
+    items = [(1, 2), (3, 4)]
+
+    i = ChIter(items).dict()
+
+    assert isinstance(i, dict)
+    assert dict(items) == i
