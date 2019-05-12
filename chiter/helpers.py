@@ -18,7 +18,7 @@ def to_chiter(*, copy_length_hint=False):
             length_hint = self._length_hint
             result = func(self, *args, **kwargs)
 
-            if result is NotImplemented or hasattr(result, '__wrapped__') and is_chiter(cls, result.__wrapped__):
+            if result is NotImplemented or hasattr(result, "__wrapped__") and is_chiter(cls, result.__wrapped__):
                 return result
 
             chiter = cls(result)
