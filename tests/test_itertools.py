@@ -1,4 +1,5 @@
 import itertools
+from operator import length_hint
 
 from chiter import ChIter
 
@@ -10,8 +11,8 @@ def test_accumulate():
     assert list(i) == list(itertools.accumulate(range(5)))
 
 
-def test_flatten():
-    i = ChIter(enumerate(range(5))).flatten()
+def test_flat():
+    i = ChIter(enumerate(range(5))).flat()
 
     assert isinstance(i, ChIter)
     assert list(i) == list(itertools.chain.from_iterable(enumerate(range(5))))
@@ -161,6 +162,12 @@ def test_starmap():
     assert list(itertools.starmap(pow, enumerate(range(5)))) == list(i)
 
 
+def test_starmap_length_hint():
+    i = ChIter(enumerate(range(5))).starmap(pow)
+
+    assert length_hint(enumerate(range(5))) == length_hint(i)
+
+
 def test_takewhile():
     def predicate(x):
         return x <= 2
@@ -176,6 +183,12 @@ def test_zip_longest():
 
     assert isinstance(i, ChIter)
     assert list(itertools.zip_longest(*enumerate(range(5)))) == list(i)
+
+
+def test_zip_longest_length_hint():
+    i = ChIter(enumerate(range(5))).zip_longest()
+
+    assert length_hint(enumerate(range(5))) == length_hint(i)
 
 
 def test_zip_longest_fillvalue():

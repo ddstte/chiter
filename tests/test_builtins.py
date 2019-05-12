@@ -1,5 +1,5 @@
 from functools import reduce
-from operator import add
+from operator import add, length_hint
 
 from chiter import ChIter
 
@@ -18,6 +18,12 @@ def test_map():
     assert list(i) == list(range(1, 6))
 
 
+def test_map_length_hint():
+    i = ChIter(range(5)).map(lambda x: x + 1)
+
+    assert length_hint(range(5)) == length_hint(i)
+
+
 def test_enumerate():
     i = ChIter(range(5)).enumerate()
 
@@ -30,6 +36,12 @@ def test_enumerate_start():
 
     assert isinstance(i, ChIter)
     assert list(i) == list(enumerate(range(5), start=2))
+
+
+def test_enumerate_length_hint():
+    i = ChIter(range(5)).enumerate()
+
+    assert length_hint(range(5)) == length_hint(i)
 
 
 def test_zip():
@@ -74,11 +86,23 @@ def test_sorted_key_reverse():
     assert list(i) == sorted(range(5), key=lambda x: -x, reverse=True)
 
 
+def test_sorted_length_hint():
+    i = ChIter(range(5)).sorted()
+
+    assert length_hint(range(5)) == length_hint(i)
+
+
 def test_reversed():
     i = ChIter(range(5)).reversed()
 
     assert isinstance(i, ChIter)
     assert list(i) == list(reversed(range(5)))
+
+
+def test_reversed_length_hint():
+    i = ChIter(range(5)).reversed()
+
+    assert length_hint(range(5)) == length_hint(i)
 
 
 def test_all_true():

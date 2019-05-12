@@ -1,10 +1,11 @@
 from __future__ import annotations
 
 import itertools
+import operator
 from functools import reduce
-from operator import length_hint, add
 from typing import Any, Callable, Optional, Iterable, Iterator, Set, FrozenSet, List, Tuple, Dict
 
+from .helpers import to_chiter
 from .meta import ChIterMeta
 
 
@@ -14,11 +15,11 @@ class ChIter(Iterator[Any], metaclass=ChIterMeta):
     @classmethod
     def from_iterables(cls, *iterables) -> ChIter:
         obj = cls(itertools.chain(*iterables))
-        obj._length_hint = sum(map(length_hint, iterables))
+        obj._length_hint = sum(map(operator.length_hint, iterables))
         return obj
 
     def __init__(self, iterable: Iterable):
-        self._length_hint = length_hint(iterable)
+        self._length_hint = operator.length_hint(iterable)
         self._iterable = iter(iterable)
 
     def __iter__(self) -> Iterator:
@@ -45,22 +46,26 @@ class ChIter(Iterator[Any], metaclass=ChIterMeta):
     def filter(self, func: Optional[Callable]) -> ChIter:
         return filter(func, self)
 
+    @to_chiter(copy_length_hint=True)
     def map(self, func: Callable) -> ChIter:
         return map(func, self)
 
+    @to_chiter(copy_length_hint=True)
     def enumerate(self, start: int = 0) -> ChIter:
         return enumerate(self, start=start)
 
     def zip(self) -> ChIter:
         return zip(*self)
 
-    def reduce(self, func: Callable, initial=None) -> Any:
+    def reduce(self, function: Callable, initial=None) -> Any:
         args = (i for i in (self, initial) if i is not None)
-        return reduce(func, *args)
+        return reduce(function, *args)
 
+    @to_chiter(copy_length_hint=True)
     def sorted(self, key: Optional[Callable] = None, reverse: bool = False) -> ChIter:
         return sorted(self, key=key, reverse=reverse)
 
+    @to_chiter(copy_length_hint=True)
     def reversed(self) -> ChIter:
         return reversed(tuple(self))
 
@@ -85,7 +90,7 @@ class ChIter(Iterator[Any], metaclass=ChIterMeta):
     def dict(self) -> Dict[Any, Any]:
         return dict(self)
 
-    def accumulate(self, func=add) -> ChIter:
+    def accumulate(self, func=operator.add) -> ChIter:
         return itertools.accumulate(self, func)
 
     def combinations(self, r: int) -> ChIter:
@@ -121,6 +126,7 @@ class ChIter(Iterator[Any], metaclass=ChIterMeta):
     def takewhile(self, func=Callable) -> ChIter:
         return itertools.takewhile(func, self)
 
+    @to_chiter(copy_length_hint=True)
     def starmap(self, func: Callable) -> ChIter:
         return itertools.starmap(func, self)
 
@@ -130,8 +136,9 @@ class ChIter(Iterator[Any], metaclass=ChIterMeta):
     def cycle(self) -> ChIter:
         return itertools.cycle(self)
 
+    @to_chiter(copy_length_hint=True)
     def zip_longest(self, *, fillvalue=None) -> ChIter:
         return itertools.zip_longest(*self, fillvalue=fillvalue)
 
-    def flatten(self) -> ChIter:
+    def flat(self) -> ChIter:
         return itertools.chain.from_iterable(self)
