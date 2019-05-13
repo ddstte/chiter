@@ -105,6 +105,21 @@ def test_reversed_length_hint():
     assert length_hint(range(5)) == length_hint(i)
 
 
+def test_sum():
+    i = ChIter(range(5)).sum()
+
+    assert isinstance(i, int)
+    assert sum(range(5)) == i
+
+
+def test_sum_start():
+    start = 3
+    i = ChIter(range(5)).sum(start)
+
+    assert isinstance(i, int)
+    assert sum(range(5), start) == i
+
+
 def test_all_true():
     result = ChIter(range(1, 2)).all()
 

@@ -5,6 +5,7 @@ import operator
 from functools import reduce
 from typing import Any, Callable, Optional, Iterable, Iterator, Set, FrozenSet, List, Tuple, Dict
 
+from .deferred_iterator import DeferredIterator
 from .helpers import to_chiter
 from .meta import ChIterMeta
 
@@ -63,11 +64,14 @@ class ChIter(Iterator[Any], metaclass=ChIterMeta):
 
     @to_chiter(copy_length_hint=True)
     def sorted(self, key: Optional[Callable] = None, reverse: bool = False) -> ChIter:
-        return sorted(self, key=key, reverse=reverse)
+        return DeferredIterator(lambda: sorted(self, key=key, reverse=reverse))
 
     @to_chiter(copy_length_hint=True)
     def reversed(self) -> ChIter:
-        return reversed(tuple(self))
+        return DeferredIterator(lambda: reversed(tuple(self)))
+
+    def sum(self, start=0) -> int:
+        return sum(self, start)
 
     def all(self) -> bool:
         return all(self)
