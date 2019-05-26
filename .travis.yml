@@ -19,4 +19,4 @@ jobs:
         - poetry run black --check .
     - stage: test
       name: tests
-      script: poetry run pytest
+      script: poetry run tox
