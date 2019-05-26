@@ -10,6 +10,7 @@ stages:
   - tests
 
 install:
+  - pip install --upgrade pip
   - pip install poetry
   - poetry install
 
@@ -22,4 +23,4 @@ jobs:
         - poetry run black --check .
     - stage: test
       name: tests
-      script: poetry run tox
+      script: poetry run tox -e $(echo py$TRAVIS_PYTHON_VERSION | tr -d .)
