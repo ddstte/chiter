@@ -21,7 +21,6 @@ jobs:
       script:
         - poetry run flake8
         - poetry run black --check .
-    - stage: test
-      name: tests
-      script:
-        - tox -e $(echo py$TRAVIS_PYTHON_VERSION | tr -d .)
+
+script:
+  - poetry run tox -e $(echo py$TRAVIS_PYTHON_VERSION | tr -d .)
