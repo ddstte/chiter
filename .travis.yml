@@ -23,4 +23,5 @@ jobs:
         - poetry run black --check .
     - stage: test
       name: tests
-      script: poetry run tox -e $(echo py$TRAVIS_PYTHON_VERSION | tr -d .)
+      script:
+        - tox -e $(echo py$TRAVIS_PYTHON_VERSION | tr -d .)
