@@ -5,8 +5,8 @@ description = "iterable as a chain"
 authors = ["Yaroslav Bibaev <yaroslav@gmx.com>"]
 license = "MIT"
 readme = 'README.md'
-repository = "https://github.com/nedel/chiter"
-homepage = "https://github.com/nedel/chiter"
+repository = "https://github.com/nede1/chiter"
+homepage = "https://github.com/nede1/chiter"
 keywords = ["fluent interface", "method chaining"]
 
 [tool.poetry.dependencies]
