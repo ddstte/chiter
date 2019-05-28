@@ -7,7 +7,7 @@ license = "MIT"
 readme = 'README.md'
 repository = "https://github.com/nedel/chiter"
 homepage = "https://github.com/nedel/chiter"
-keywords = ['fluent interface', 'method chaining']
+keywords = ["fluent interface", "method chaining"]
 
 [tool.poetry.dependencies]
 python = "^3.7"
