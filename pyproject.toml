@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "chiter"
-version = "1.0.0-alpha.1"
+version = "1.0.0-alpha.2"
 description = "iterable as a chain"
 authors = ["Yaroslav Bibaev <yaroslav@gmx.com>"]
 license = "MIT"
