@@ -2,16 +2,14 @@ from __future__ import annotations
 
 import itertools
 import operator
-from functools import reduce
+from functools import reduce, partial
 from typing import Any, Callable, Optional, Iterable, Iterator, Set, FrozenSet, List, Tuple, Dict
 
-from .deferred_iterator import DeferredIterator
-from .helpers import to_chiter
-from .meta import ChIterMeta
+from .pipeline import Pipeline
 
 
-class ChIter(Iterator[Any], metaclass=ChIterMeta):
-    __slots__ = ("_iterable", "_length_hint")
+class ChIter(Iterator[Any]):
+    __slots__ = ("_iterable", "_length_hint", "_strategy")
 
     @classmethod
     def from_iterables(cls, *iterables) -> ChIter:
@@ -22,13 +20,19 @@ class ChIter(Iterator[Any], metaclass=ChIterMeta):
     def __init__(self, iterable: Iterable):
         self._length_hint = operator.length_hint(iterable)
         self._iterable = iter(iterable)
+        self._strategy = []
 
     def __iter__(self) -> Iterator:
         return self
 
     def __next__(self) -> Any:
+        if self._strategy:
+            self._iterable = iter(Pipeline(*self._strategy)(self._iterable))
+            self._strategy = []
+
         if self._length_hint:
             self._length_hint -= 1
+
         return next(self._iterable)
 
     def __add__(self, other) -> ChIter:
@@ -45,30 +49,33 @@ class ChIter(Iterator[Any], metaclass=ChIterMeta):
         return self._length_hint
 
     def filter(self, func: Optional[Callable]) -> ChIter:
-        return filter(func, self)
+        self._strategy.append(partial(filter, func))
+        return self
 
-    @to_chiter(copy_length_hint=True)
     def map(self, func: Callable) -> ChIter:
-        return map(func, self)
+        self._strategy.append(partial(map, func))
+        return self
 
-    @to_chiter(copy_length_hint=True)
     def enumerate(self, start: int = 0) -> ChIter:
-        return enumerate(self, start=start)
+        self._strategy.append(lambda x: enumerate(x, start=start))
+        return self
 
     def zip(self) -> ChIter:
-        return zip(*self)
+        self._strategy.append(lambda x: zip(*x))
+        return self
 
     def reduce(self, function: Callable, initial=None) -> Any:
         args = (i for i in (self, initial) if i is not None)
         return reduce(function, *args)
 
-    @to_chiter(copy_length_hint=True)
     def sorted(self, key: Optional[Callable] = None, reverse: bool = False) -> ChIter:
-        return DeferredIterator(lambda: sorted(self, key=key, reverse=reverse))
+        self._strategy.append(lambda x: sorted(x, key=key, reverse=reverse))
+        return self
 
-    @to_chiter(copy_length_hint=True)
     def reversed(self) -> ChIter:
-        return DeferredIterator(lambda: reversed(tuple(self)))
+        self._strategy.append(tuple)
+        self._strategy.append(reversed)
+        return self
 
     def sum(self, start=0) -> int:
         return sum(self, start)
@@ -95,54 +102,69 @@ class ChIter(Iterator[Any], metaclass=ChIterMeta):
         return dict(self)
 
     def accumulate(self, func=operator.add) -> ChIter:
-        return itertools.accumulate(self, func)
+        self._strategy.append(lambda x: itertools.accumulate(x, func))
+        return self
 
     def combinations(self, r: int) -> ChIter:
-        return itertools.combinations(self, r)
+        self._strategy.append(lambda x: itertools.combinations(x, r))
+        return self
 
     def combinations_with_replacement(self, r: int) -> ChIter:
-        return itertools.combinations_with_replacement(self, r)
+        self._strategy.append(lambda x: itertools.combinations_with_replacement(x, r))
+        return self
 
     def compress(self, selectors: Iterable[bool]) -> ChIter:
-        return itertools.compress(self, selectors)
+        self._strategy.append(lambda x: itertools.compress(x, selectors))
+        return self
 
     def dropwhile(self, predicate: Callable) -> ChIter:
-        return itertools.dropwhile(predicate, self)
+        self._strategy.append(partial(itertools.dropwhile, predicate))
+        return self
 
     def groupby(self, key: Optional[Callable] = None) -> ChIter:
-        return itertools.groupby(self, key=key)
+        self._strategy.append(lambda x: itertools.groupby(x, key=key))
+        return self
 
     def filterfalse(self, predicate: Callable) -> ChIter:
-        return itertools.filterfalse(predicate, self)
+        self._strategy.append(partial(itertools.filterfalse, predicate))
+        return self
 
     def slice(self, start: int, stop: Optional[int] = None, step: Optional[int] = None) -> ChIter:
         args = (start, stop, step)
         start_is_stop = all((i is None for i in args[1:]))
         slice_args = args[:1] if start_is_stop else args
-        return itertools.islice(self, *slice_args)
+
+        self._strategy.append(lambda x: itertools.islice(x, *slice_args))
+        return self
 
     def permutations(self, r: Optional[int] = None) -> ChIter:
-        return itertools.permutations(self, r)
+        self._strategy.append(lambda x: itertools.permutations(x, r))
+        return self
 
     def product(self, *, repeat=1) -> ChIter:
-        return itertools.product(self, repeat=repeat)
+        self._strategy.append(lambda x: itertools.product(x, repeat=repeat))
+        return self
 
     def takewhile(self, func=Callable) -> ChIter:
-        return itertools.takewhile(func, self)
+        self._strategy.append(partial(itertools.takewhile, func))
+        return self
 
-    @to_chiter(copy_length_hint=True)
     def starmap(self, func: Callable) -> ChIter:
-        return itertools.starmap(func, self)
+        self._strategy.append(partial(itertools.starmap, func))
+        return self
 
     def tee(self, n: int = 2) -> ChIter:
-        return map(type(self), itertools.tee(self, n))
+        self._strategy.append(lambda x: map(type(self), itertools.tee(x, n)))
+        return self
 
     def cycle(self) -> ChIter:
-        return itertools.cycle(self)
+        self._strategy.append(itertools.cycle)
+        return self
 
-    @to_chiter(copy_length_hint=True)
     def zip_longest(self, *, fillvalue=None) -> ChIter:
-        return itertools.zip_longest(*self, fillvalue=fillvalue)
+        self._strategy.append(lambda x: itertools.zip_longest(*x, fillvalue=fillvalue))
+        return self
 
     def flat(self) -> ChIter:
-        return itertools.chain.from_iterable(self)
+        self._strategy.append(itertools.chain.from_iterable)
+        return self
