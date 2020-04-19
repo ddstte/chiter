@@ -1,5 +1,4 @@
 from .chiter import ChIter
-from .deferred_iterator import DeferredIterator
-from .meta import ChIterMeta
+from .pipeline import Pipeline
 
-__all__ = ("ChIter", "ChIterMeta", "DeferredIterator")
+__all__ = ("ChIter", "Pipeline")
